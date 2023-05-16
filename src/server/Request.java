@@ -22,7 +22,9 @@ public class Request {
             i = -1;
         }
         for (int j = 0; j < i; j++) {
-            request.append((char) buffer[i]);
+            byte b = buffer[j];
+            char c = (char) b;
+            request.append((char) b);
         }
         System.out.println(request.toString());
 
