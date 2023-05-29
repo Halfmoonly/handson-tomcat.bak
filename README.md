@@ -1,5 +1,9 @@
 # minit-learning-demo
 
-Learn the code of [minit](https://github.com/YaleGuo/minit)
+Learning the code of [minit](https://github.com/YaleGuo/minit)
 
-The branch named "main" is always useful.
+| branch         | chapter |
+|----------------|---------|
+| main           | -       |
+| geek_chapter01 | Day1    |
+| geek_chapter02 | Day2    |
