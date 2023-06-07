@@ -9,6 +9,11 @@ public class HttpProcessor {
     }
 
     public void process(Socket socket) {
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e1) {
+            e1.printStackTrace();
+        }
         InputStream input = null;
         OutputStream output = null;
         try {
