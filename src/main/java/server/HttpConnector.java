@@ -25,8 +25,9 @@ public class HttpConnector implements Runnable {
 
         // initialize processors pool
         for (int i = 0; i < minProcessors; i++) {
-            HttpProcessor processor = new HttpProcessor();
-            processors.push(processor);
+            HttpProcessor initprocessor = new HttpProcessor(this);
+            initprocessor.start();
+            processors.push(initprocessor);
         }
         curProcessors = minProcessors;
 
@@ -39,11 +40,10 @@ public class HttpConnector implements Runnable {
                     socket.close();
                     continue;
                 }
-                processor.process(socket);
-                processors.push(processor);
+                processor.assign(socket);
 
                 // Close the socket
-                socket.close();
+//                socket.close();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -71,10 +71,15 @@ public class HttpConnector implements Runnable {
     }
 
     private HttpProcessor newProcessor() {
-        HttpProcessor initprocessor = new HttpProcessor();
+        HttpProcessor initprocessor = new HttpProcessor(this);
+        initprocessor.start();
         processors.push(initprocessor);
         curProcessors++;
         return ((HttpProcessor) processors.pop());
+    }
+
+    void recycle(HttpProcessor processor) {
+        processors.push(processor);
     }
 
 }
