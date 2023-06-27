@@ -50,7 +50,7 @@ public class HttpProcessor implements Runnable{
             request.parse(socket);
 
             // create Response object
-            Response response = new Response(output);
+            HttpResponse response = new HttpResponse(output);
             response.setRequest(request);
 //               response.sendStaticResource();
 
