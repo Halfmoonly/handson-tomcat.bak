@@ -1,9 +1,11 @@
 package server;
 
+import javax.servlet.ReadListener;
+import javax.servlet.ServletInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class SocketInputStream extends InputStream {
+public class SocketInputStream extends ServletInputStream {
     private static final byte CR = (byte) '\r';
     private static final byte LF = (byte) '\n';
     private static final byte SP = (byte) ' ';
@@ -254,5 +256,20 @@ public class SocketInputStream extends InputStream {
         if (nRead > 0) {
             count = nRead;
         }
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    @Override
+    public boolean isReady() {
+        return false;
+    }
+
+    @Override
+    public void setReadListener(ReadListener readListener) {
+
     }
 }
