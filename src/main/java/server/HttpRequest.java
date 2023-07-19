@@ -25,6 +25,10 @@ public class HttpRequest implements HttpServletRequest {
     protected HashMap<String, String> headers = new HashMap<>();
     protected Map<String, String[]> parameters = new ConcurrentHashMap<>();
     HttpRequestLine requestLine = new HttpRequestLine();
+    Cookie[] cookies;
+    HttpSession session;
+    String sessionid;
+    SessionFacade sessionFacade;
 
     public HttpRequest(InputStream input) {
         this.input = input;
@@ -35,19 +39,34 @@ public class HttpRequest implements HttpServletRequest {
         try {
             parseConnection(socket);
             this.sis.readRequestLine(requestLine);
+            parseRequestLine();
             parseHeaders();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ServletException e) {
             e.printStackTrace();
         }
+
+    }
+
+    private void parseRequestLine() {
         int question = requestLine.indexOf("?");
         if (question >= 0) {
             queryString = new String(requestLine.uri, question + 1, requestLine.uriEnd - question - 1);
             uri = new String(requestLine.uri, 0, question);
+            int semicolon = uri.indexOf(DefaultHeaders.JSESSIONID_NAME);
+            if (semicolon >= 0) {
+                sessionid = uri.substring(semicolon+DefaultHeaders.JSESSIONID_NAME.length());
+                uri = uri.substring(0, semicolon);
+            }
         } else {
             queryString = null;
             uri = new String(requestLine.uri, 0, requestLine.uriEnd);
+            int semicolon = uri.indexOf(DefaultHeaders.JSESSIONID_NAME);
+            if (semicolon >= 0) {
+                sessionid = uri.substring(semicolon+DefaultHeaders.JSESSIONID_NAME.length());
+                uri = uri.substring(0, semicolon);
+            }
         }
     }
 
@@ -82,10 +101,50 @@ public class HttpRequest implements HttpServletRequest {
                 headers.put(name, value);
             } else if (name.equals(DefaultHeaders.TRANSFER_ENCODING_NAME)) {
                 headers.put(name, value);
-            } else {
+            } else if (name.equals(DefaultHeaders.COOKIE_NAME)) {
+                headers.put(name, value);
+                Cookie[] cookiearr = parseCookieHeader(value);
+                this.cookies = cookiearr;
+                for (int i = 0; i < cookies.length; i++) {
+                    if (cookies[i].getName().equals("jsessionid")) {
+                        this.sessionid = cookies[i].getValue();
+                    }
+                }
+            }
+            else {
                 headers.put(name, value);
             }
         }
+    }
+
+    public  Cookie[] parseCookieHeader(String header) {
+        if ((header == null) || (header.length() < 1) )
+            return (new Cookie[0]);
+        ArrayList<Cookie> cookieal = new ArrayList<>();
+        while (header.length() > 0) {
+            int semicolon = header.indexOf(';');
+            if (semicolon < 0)
+                semicolon = header.length();
+            if (semicolon == 0)
+                break;
+
+            String token = header.substring(0, semicolon);
+            if (semicolon < header.length())
+                header = header.substring(semicolon + 1);
+            else
+                header = "";
+
+            try {
+                int equals = token.indexOf('=');
+                if (equals > 0) {
+                    String name = token.substring(0, equals).trim();
+                    String value = token.substring(equals+1).trim();
+                    cookieal.add(new Cookie(name, value));
+                }
+            } catch (Throwable e) {
+            }
+        }
+        return ((Cookie[]) cookieal.toArray (new Cookie [cookieal.size()]));
     }
 
     protected void parseParameters() {
@@ -431,7 +490,7 @@ public class HttpRequest implements HttpServletRequest {
 
     @Override
     public Cookie[] getCookies() {
-        return null;
+        return this.cookies;
     }
 
     @Override
@@ -516,12 +575,33 @@ public class HttpRequest implements HttpServletRequest {
 
     @Override
     public HttpSession getSession() {
-        return null;
+        return this.sessionFacade;
     }
 
     @Override
-    public HttpSession getSession(boolean arg0) {
-        return null;
+    public HttpSession getSession(boolean create) {
+        if (sessionFacade != null)
+            return sessionFacade;
+        if (sessionid != null) {
+            session = HttpConnector.sessions.get(sessionid);
+            if (session != null) {
+                sessionFacade = new SessionFacade(session);
+                return sessionFacade;
+            } else {
+                session = HttpConnector.createSession();
+                sessionFacade = new SessionFacade(session);
+                return sessionFacade;
+            }
+        } else {
+            session = HttpConnector.createSession();
+            sessionFacade = new SessionFacade(session);
+            sessionid = session.getId();
+            return sessionFacade;
+        }
+    }
+
+    public String getSessionId() {
+        return this.sessionid;
     }
 
     @Override

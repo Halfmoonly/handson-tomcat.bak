@@ -25,8 +25,7 @@ public class SocketInputStream extends ServletInputStream {
     }
 
     public void readRequestLine(HttpRequestLine requestLine)
-        throws IOException {
-
+            throws IOException {
         int chr = 0;
         do {
             try {
@@ -56,7 +55,10 @@ public class SocketInputStream extends ServletInputStream {
             readCount++;
             pos++;
         }
-        requestLine.uriEnd = readCount - 1;
+
+        requestLine.methodEnd = readCount - 1;
+
+        // Reading URI
         maxRead = requestLine.uri.length;
         readStart = pos;
         readCount = 0;
@@ -64,7 +66,9 @@ public class SocketInputStream extends ServletInputStream {
         space = false;
 
         boolean eol = false;
+
         while (!space) {
+            // We're at the end of the internal buffer
             if (pos >= count) {
                 int val = read();
                 if (val == -1)
@@ -81,12 +85,17 @@ public class SocketInputStream extends ServletInputStream {
         }
 
         requestLine.uriEnd = readCount - 1;
+
+        // Reading protocol
         maxRead = requestLine.protocol.length;
         readStart = pos;
         readCount = 0;
 
         while (!eol) {
+            // We're at the end of the internal buffer
             if (pos >= count) {
+                // Copying part (or all) of the internal buffer to the line
+                // buffer
                 int val = read();
                 if (val == -1)
                     throw new IOException("requestStream.readline.error");
