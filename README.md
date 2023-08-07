@@ -12,3 +12,4 @@ Learning the code of [minit](https://github.com/YaleGuo/minit)
 | geek_chapter05 | Day8        |
 | geek_chapter06 | Day9、Day10  |
 | geek_chapter07 | Day11、Day12 |
+| geek_chapter08 | Day13、Day14 |
