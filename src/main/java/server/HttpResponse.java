@@ -19,7 +19,7 @@ public class HttpResponse implements HttpServletResponse {
     String contentType = null;
     long contentLength = -1;
     String charset = null;
-    String characterEncoding = null;
+    String characterEncoding = "UTF-8";
     String protocol = "HTTP/1.1";
 
     Map<String, String> headers = new ConcurrentHashMap<>();
@@ -27,7 +27,15 @@ public class HttpResponse implements HttpServletResponse {
     int status = HttpServletResponse.SC_OK;
     ArrayList<Cookie> cookies = new ArrayList<>();
 
+    public HttpResponse() {
+
+    }
+
     public HttpResponse(OutputStream output) {
+        this.output = output;
+    }
+
+    public void setStream(OutputStream output) {
         this.output = output;
     }
 
@@ -119,6 +127,14 @@ public class HttpResponse implements HttpServletResponse {
         outputWriter.flush();
     }
 
+    public void finishResponse() {
+        try {
+            this.getWriter().flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private long getContentLength() {
         return this.contentLength;
     }
@@ -162,7 +178,9 @@ public class HttpResponse implements HttpServletResponse {
 
     @Override
     public PrintWriter getWriter() throws IOException {
-        writer = new PrintWriter(new OutputStreamWriter(output, getCharacterEncoding()), true);
+        if (writer == null) {
+            writer = new PrintWriter(new OutputStreamWriter(output, getCharacterEncoding()), true);
+        }
         return writer;
     }
 
@@ -210,6 +228,13 @@ public class HttpResponse implements HttpServletResponse {
     @Override
     public void addCookie(Cookie cookie) {
         synchronized (cookies) {
+            Iterator<Cookie> items = cookies.iterator();
+            while (items.hasNext()) {
+                Cookie tmpcookie = (Cookie) items.next();
+                if (tmpcookie.getName().equals(cookie.getName())) {
+                    items.remove();
+                }
+            }
             cookies.add(cookie);
         }
     }
