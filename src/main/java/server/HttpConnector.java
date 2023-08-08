@@ -16,7 +16,7 @@ public class HttpConnector implements Runnable {
     int curProcessors = 0;
     Deque<HttpProcessor> processors = new ArrayDeque<>();
     public static Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
-    public static URLClassLoader loader = null;
+    ServletContainer container = null;
 
     public void run() {
         ServerSocket serverSocket = null;
@@ -26,18 +26,6 @@ public class HttpConnector implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
-        }
-
-        try {
-            URL[] urls = new URL[1];
-            URLStreamHandler streamHandler = null;
-            File classPath = new File(HttpServer.WEB_ROOT);
-            String repository = (new URL("file", null, classPath.getCanonicalPath() + File.separator)).toString() ;
-            urls[0] = new URL(null, repository, streamHandler);
-            loader = new URLClassLoader(urls);
-        }
-        catch (IOException e) {
-            System.out.println(e.toString() );
         }
 
         // initialize processors pool
@@ -71,6 +59,14 @@ public class HttpConnector implements Runnable {
     public void start() {
         Thread thread = new Thread(this);
         thread.start();
+    }
+
+    public ServletContainer getContainer() {
+        return container;
+    }
+
+    public void setContainer(ServletContainer container) {
+        this.container = container;
     }
 
     private HttpProcessor createProcessor() {
