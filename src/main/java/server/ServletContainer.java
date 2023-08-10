@@ -10,12 +10,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class ServletContainer {
     HttpConnector connector = null;
     ClassLoader loader = null;
     Map<String,String> servletClsMap = new ConcurrentHashMap<>(); //servletName - ServletClassName
-    Map<String,Servlet> servletInstanceMap = new ConcurrentHashMap<>();//servletName - servlet
+    Map<String,ServletWrapper> servletInstanceMap = new ConcurrentHashMap<>();//servletName - servlet
 
     public ServletContainer() {
         try {
@@ -58,39 +60,26 @@ public class ServletContainer {
 
     public void invoke(HttpRequest request, HttpResponse response)
             throws IOException, ServletException {
-        Servlet servlet = null;
-        ClassLoader loader = getLoader();
+        ServletWrapper servletWrapper = null;
         String uri = request.getUri();
         String servletName = uri.substring(uri.lastIndexOf("/") + 1);
         String servletClassName = servletName;
 
-        servlet = servletInstanceMap.get(servletName);
-        if (servlet == null) {
-            Class<?> servletClass = null;
-            try {
-                servletClass = loader.loadClass(servletClassName);
-            } catch (ClassNotFoundException e) {
-                System.out.println(e.toString());
-            }
-            try {
-                servlet = (Servlet) servletClass.newInstance();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+        servletWrapper = servletInstanceMap.get(servletName);
+        if ( servletWrapper == null) {
+            servletWrapper = new ServletWrapper(servletClassName,this);
+            //servletWrapper.setParent(this);
 
-            servletClsMap.put(servletName, servletClassName);
-            servletInstanceMap.put(servletName, servlet);
-
-            servlet.init(null);
+            this.servletClsMap.put(servletName, servletClassName);
+            this.servletInstanceMap.put(servletName, servletWrapper);
         }
 
         try {
-            HttpRequestFacade requestFacade = new HttpRequestFacade(request);
-            HttpResponseFacade responseFacade = new HttpResponseFacade(response);
+            HttpServletRequest requestFacade = new HttpRequestFacade(request);
+            HttpServletResponse responseFacade = new HttpResponseFacade(response);
             System.out.println("Call service()");
-            servlet.service(requestFacade, responseFacade);
+
+            servletWrapper.invoke(requestFacade, responseFacade);
         }
         catch (Exception e) {
             System.out.println(e.toString());
