@@ -16,7 +16,7 @@ public class HttpConnector implements Runnable {
     int curProcessors = 0;
     Deque<HttpProcessor> processors = new ArrayDeque<>();
     public static Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
-    ServletContainer container = null;
+    ServletContext container = null;
 
     public void run() {
         ServerSocket serverSocket = null;
@@ -61,11 +61,11 @@ public class HttpConnector implements Runnable {
         thread.start();
     }
 
-    public ServletContainer getContainer() {
+    public ServletContext getContainer() {
         return container;
     }
 
-    public void setContainer(ServletContainer container) {
+    public void setContainer(ServletContext container) {
         this.container = container;
     }
 

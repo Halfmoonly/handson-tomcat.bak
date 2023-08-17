@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class HttpResponseFacade implements HttpServletResponse {
     private HttpServletResponse response;
-    public HttpResponseFacade(HttpResponse response) {
+    public HttpResponseFacade(HttpServletResponse response) {
         this.response = response;
     }
 

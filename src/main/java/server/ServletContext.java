@@ -1,5 +1,8 @@
 package server;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -8,18 +11,12 @@ import java.net.URLStreamHandler;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-public class ServletContainer {
+public class ServletContext extends ContainerBase{
     HttpConnector connector = null;
-    ClassLoader loader = null;
     Map<String,String> servletClsMap = new ConcurrentHashMap<>(); //servletName - ServletClassName
-    Map<String,ServletWrapper> servletInstanceMap = new ConcurrentHashMap<>();//servletName - servlet
+    Map<String,ServletWrapper> servletInstanceMap = new ConcurrentHashMap<>();//servletName - servletWrapper
 
-    public ServletContainer() {
+    public ServletContext() {
         try {
             // create a URLClassLoader
             URL[] urls = new URL[1];
@@ -33,15 +30,7 @@ public class ServletContainer {
         }
     }
     public String getInfo() {
-        return null;
-    }
-
-    public ClassLoader getLoader(){
-        return this.loader;
-    }
-
-    public void setLoader(ClassLoader loader) {
-        this.loader = loader;
+        return "Minit Servlet Context, vesion 0.1";
     }
 
     public HttpConnector getConnector() {
@@ -51,17 +40,10 @@ public class ServletContainer {
         this.connector = connector;
     }
 
-    public String getName() {
-        return null;
-    }
-
-    public void setName(String name) {
-    }
-
-    public void invoke(HttpRequest request, HttpResponse response)
+    public void invoke(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
         ServletWrapper servletWrapper = null;
-        String uri = request.getUri();
+        String uri = ((HttpRequest)request).getUri();
         String servletName = uri.substring(uri.lastIndexOf("/") + 1);
         String servletClassName = servletName;
 

@@ -6,14 +6,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class ServletWrapper {
+public class ServletWrapper extends ContainerBase{
     private Servlet instance = null;
     private String servletClass;
-    private ClassLoader loader;
-    private String name;
-    protected ServletContainer parent = null;
 
-    public ServletWrapper(String servletClass, ServletContainer parent) {
+    public ServletWrapper(String servletClass,ServletContext parent) {
         this.parent = parent;
         this.servletClass = servletClass;
         try {
@@ -23,36 +20,28 @@ public class ServletWrapper {
         }
     }
 
-    public ClassLoader getLoader() {
-        if (loader != null)
-            return loader;
-        return parent.getLoader();
-    }
     public String getServletClass() {
         return servletClass;
     }
     public void setServletClass(String servletClass) {
         this.servletClass = servletClass;
     }
-    public ServletContainer getParent() {
-        return parent;
-    }
-    public void setParent(ServletContainer container) {
-        parent = container;
-    }
     public Servlet getServlet(){
         return this.instance;
     }
-
     public Servlet loadServlet() throws ServletException {
         if (instance!=null)
             return instance;
+
         Servlet servlet = null;
         String actualClass = servletClass;
         if (actualClass == null) {
             throw new ServletException("servlet class has not been specified");
         }
+
         ClassLoader classLoader = getLoader();
+
+        // Load the specified servlet class from the appropriate class loader
         Class classClass = null;
         try {
             if (classLoader!=null) {
@@ -62,6 +51,7 @@ public class ServletWrapper {
         catch (ClassNotFoundException e) {
             throw new ServletException("Servlet class not found");
         }
+        // Instantiate and initialize an instance of the servlet class itself
         try {
             servlet = (Servlet) classClass.newInstance();
         }
@@ -69,6 +59,7 @@ public class ServletWrapper {
             throw new ServletException("Failed to instantiate servlet");
         }
 
+        // Call the initialization method of this servlet
         try {
             servlet.init(null);
         }
@@ -85,4 +76,13 @@ public class ServletWrapper {
             instance.service(request, response);
         }
     }
+    @Override
+    public String getInfo() {
+        return "Minit Servlet Wrapper, version 0.1";
+    }
+
+    public void addChild(Container child) {}
+    public Container findChild(String name) {return null;}
+    public Container[] findChildren() {return null;}
+    public void removeChild(Container child) {}
 }
