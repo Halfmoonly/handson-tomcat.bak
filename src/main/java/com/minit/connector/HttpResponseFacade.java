@@ -1,4 +1,4 @@
-package server;
+package com.minit.connector;
 
 import java.io.IOException;
 import java.io.PrintWriter;

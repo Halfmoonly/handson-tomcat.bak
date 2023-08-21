@@ -1,7 +1,9 @@
-package server;
+package com.minit.connector.http;
+
+import com.minit.core.StandardContext;
+import com.minit.session.StandardSession;
 
 import javax.servlet.http.HttpSession;
-import java.io.File;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayDeque;
@@ -16,7 +18,7 @@ public class HttpConnector implements Runnable {
     int curProcessors = 0;
     Deque<HttpProcessor> processors = new ArrayDeque<>();
     public static Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
-    ServletContext container = null;
+    StandardContext container = null;
 
     public void run() {
         ServerSocket serverSocket = null;
@@ -61,11 +63,11 @@ public class HttpConnector implements Runnable {
         thread.start();
     }
 
-    public ServletContext getContainer() {
+    public StandardContext getContainer() {
         return container;
     }
 
-    public void setContainer(ServletContext container) {
+    public void setContainer(StandardContext container) {
         this.container = container;
     }
 
@@ -95,8 +97,8 @@ public class HttpConnector implements Runnable {
         processors.push(processor);
     }
 
-    public static Session createSession() {
-        Session session = new Session();
+    public static StandardSession createSession() {
+        StandardSession session = new StandardSession();
         session.setValid(true);
         session.setCreationTime(System.currentTimeMillis());
         String sessionId = generateSessionId();

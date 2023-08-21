@@ -1,4 +1,6 @@
-package server;
+package com.minit.core;
+
+import com.minit.Container;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

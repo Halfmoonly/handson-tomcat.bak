@@ -1,4 +1,4 @@
-package server;
+package com.minit;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
