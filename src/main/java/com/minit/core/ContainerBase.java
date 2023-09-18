@@ -1,6 +1,7 @@
 package com.minit.core;
 
 import com.minit.Container;
+import com.minit.Logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,6 +11,7 @@ public abstract class ContainerBase implements Container {
     protected ClassLoader loader = null;
     protected String name = null;
     protected Container parent = null;
+    protected Logger logger = null;
 
     public abstract String getInfo();
     public ClassLoader getLoader() {
@@ -91,5 +93,48 @@ public abstract class ContainerBase implements Container {
         }
         child.setParent(null);
 
+    }
+
+    public Logger getLogger() {
+        if (logger != null)
+            return (logger);
+        if (parent != null)
+            return (parent.getLogger());
+        return (null);
+    }
+
+    public synchronized void setLogger(Logger logger) {
+        Logger oldLogger = this.logger;
+        if (oldLogger == logger)
+            return;
+        this.logger = logger;
+    }
+
+    protected void log(String message) {
+        Logger logger = getLogger();
+        if (logger != null)
+            logger.log(logName() + ": " + message);
+        else
+            System.out.println(logName() + ": " + message);
+    }
+
+
+    protected void log(String message, Throwable throwable) {
+        Logger logger = getLogger();
+        if (logger != null)
+            logger.log(logName() + ": " + message, throwable);
+        else {
+            System.out.println(logName() + ": " + message + ": " + throwable);
+            throwable.printStackTrace(System.out);
+        }
+
+    }
+
+    protected String logName() {
+        String className = this.getClass().getName();
+        int period = className.lastIndexOf(".");
+        if (period >= 0)
+            className = className.substring(period + 1);
+        return (className + "[" + getName() + "]");
     }
 }
