@@ -1,5 +1,7 @@
 package com.minit.connector.http;
 
+import com.minit.Request;
+import com.minit.Response;
 import com.minit.connector.http.HttpConnector;
 import com.minit.connector.http.HttpRequestImpl;
 import com.minit.connector.http.HttpResponseImpl;
@@ -14,7 +16,7 @@ public class ServletProcessor {
         this.connector = connector;
     }
 
-    public void process(HttpRequestImpl request, HttpResponseImpl response) throws IOException, ServletException {
+    public void process(Request request, Response response) throws IOException, ServletException {
         this.connector.getContainer().invoke(request, response);
     }
 

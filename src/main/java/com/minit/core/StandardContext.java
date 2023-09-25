@@ -1,6 +1,7 @@
 package com.minit.core;
 
 import com.minit.Context;
+import com.minit.Request;
 import com.minit.Wrapper;
 import com.minit.connector.HttpRequestFacade;
 import com.minit.connector.HttpResponseFacade;
@@ -50,7 +51,7 @@ public class StandardContext extends ContainerBase implements Context {
         this.connector = connector;
     }
 
-    public void invoke(HttpServletRequest request, HttpServletResponse response)
+    public void invoke(Request request, Request response)
             throws IOException, ServletException {
         StandardWrapper servletWrapper = null;
         String uri = ((HttpRequestImpl)request).getUri();
