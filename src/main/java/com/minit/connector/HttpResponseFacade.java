@@ -1,5 +1,7 @@
 package com.minit.connector;
 
+import com.minit.connector.http.HttpResponseImpl;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
@@ -11,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class HttpResponseFacade implements HttpServletResponse {
     private HttpServletResponse response;
-    public HttpResponseFacade(HttpServletResponse response) {
+    public HttpResponseFacade(HttpResponseImpl response) {
         this.response = response;
     }
 

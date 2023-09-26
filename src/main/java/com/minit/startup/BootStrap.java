@@ -7,7 +7,7 @@ import com.minit.logger.FileLogger;
 
 import java.io.File;
 
-public class Bootstrap {
+public class BootStrap {
     public static final String WEB_ROOT =
             System.getProperty("user.dir") + File.separator + "webroot";
     private static int debug = 0;

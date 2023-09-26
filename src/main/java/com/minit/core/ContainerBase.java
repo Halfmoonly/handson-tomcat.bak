@@ -1,14 +1,20 @@
 package com.minit.core;
 
-import com.minit.*;
-
-import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class ContainerBase implements Container, Pipeline {
-    protected Map<String, Container> children = new ConcurrentHashMap<>();
+import javax.servlet.ServletException;
+
+import com.minit.Container;
+import com.minit.Logger;
+import com.minit.Pipeline;
+import com.minit.Request;
+import com.minit.Response;
+import com.minit.Valve;
+
+public abstract class ContainerBase implements Container,Pipeline {
+    protected Map<String,Container> children = new ConcurrentHashMap<>();
     protected ClassLoader loader = null;
     protected String name = null;
     protected Container parent = null;
@@ -40,6 +46,7 @@ public abstract class ContainerBase implements Container, Pipeline {
         pipeline.setBasic(valve);
     }
 
+
     public abstract String getInfo();
     public ClassLoader getLoader() {
         if (loader != null)
@@ -48,17 +55,17 @@ public abstract class ContainerBase implements Container, Pipeline {
             return (parent.getLoader());
         return (null);
     }
-
     public synchronized void setLoader(ClassLoader loader) {
         ClassLoader oldLoader = this.loader;
-        if (oldLoader == loader) {
+        if (oldLoader == loader)
             return;
-        }
         this.loader = loader;
     }
 
     public String getName() {
+
         return (name);
+
     }
 
 
@@ -112,7 +119,6 @@ public abstract class ContainerBase implements Container, Pipeline {
     }
 
     public void removeChild(Container child) {
-
         synchronized(children) {
             if (children.get(child.getName()) == null)
                 return;
@@ -128,13 +134,15 @@ public abstract class ContainerBase implements Container, Pipeline {
         if (parent != null)
             return (parent.getLogger());
         return (null);
-    }
 
+    }
     public synchronized void setLogger(Logger logger) {
+        // Change components if necessary
         Logger oldLogger = this.logger;
         if (oldLogger == logger)
             return;
         this.logger = logger;
+
     }
 
     protected void log(String message) {
@@ -164,4 +172,5 @@ public abstract class ContainerBase implements Container, Pipeline {
             className = className.substring(period + 1);
         return (className + "[" + getName() + "]");
     }
+
 }

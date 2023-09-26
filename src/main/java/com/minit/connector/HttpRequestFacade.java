@@ -1,5 +1,7 @@
 package com.minit.connector;
 
+import com.minit.connector.http.HttpRequestImpl;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -27,7 +29,7 @@ import javax.servlet.http.Part;
 public class HttpRequestFacade implements HttpServletRequest {
     private HttpServletRequest request;
 
-    public HttpRequestFacade(HttpServletRequest request) {
+    public HttpRequestFacade(HttpRequestImpl request) {
         this.request = request;
     }
 

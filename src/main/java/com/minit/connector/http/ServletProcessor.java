@@ -17,6 +17,7 @@ public class ServletProcessor {
     }
 
     public void process(Request request, Response response) throws IOException, ServletException {
+        System.out.println("ServletProcessor process()");
         this.connector.getContainer().invoke(request, response);
     }
 
