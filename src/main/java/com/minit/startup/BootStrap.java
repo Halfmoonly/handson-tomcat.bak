@@ -2,6 +2,8 @@ package com.minit.startup;
 
 import com.minit.Logger;
 import com.minit.connector.http.HttpConnector;
+import com.minit.core.FilterDef;
+import com.minit.core.FilterMap;
 import com.minit.core.StandardContext;
 import com.minit.logger.FileLogger;
 
@@ -22,6 +24,18 @@ public class BootStrap {
 
         Logger logger = new FileLogger();
         container.setLogger(logger);
+
+        FilterDef filterDef = new FilterDef();
+        filterDef.setFilterName("TestFilter");
+        filterDef.setFilterClass("test.TestFilter");
+        container.addFilterDef(filterDef);
+
+        FilterMap filterMap = new FilterMap();
+        filterMap.setFilterName("TestFilter");
+        filterMap.setURLPattern("/*");
+        container.addFilterMap(filterMap);
+
+        container.filterStart();
 
         connector.start();
     }
