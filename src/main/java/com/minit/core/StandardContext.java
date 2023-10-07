@@ -1,9 +1,6 @@
 package com.minit.core;
 
-import com.minit.Context;
-import com.minit.Request;
-import com.minit.Response;
-import com.minit.Wrapper;
+import com.minit.*;
 import com.minit.connector.http.HttpConnector;
 import com.minit.startup.BootStrap;
 
@@ -15,6 +12,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLStreamHandler;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +25,9 @@ public class StandardContext extends ContainerBase implements Context{
     private Map<String,ApplicationFilterConfig> filterConfigs = new ConcurrentHashMap<>();
     private Map<String,FilterDef> filterDefs = new ConcurrentHashMap<>();
     private FilterMap filterMaps[] = new FilterMap[0];
+
+    private ArrayList<ContainerListenerDef> listenerDefs = new ArrayList<>();
+    private ArrayList<ContainerListener> listeners = new ArrayList<>();
 
     public StandardContext() {
         super();
@@ -45,6 +46,39 @@ public class StandardContext extends ContainerBase implements Context{
         }
         log("Container created.");
     }
+
+    public void start(){
+        fireContainerEvent("Container Started",this);
+    }
+
+    public void addContainerListener(ContainerListener listener) {
+        synchronized (listeners) {
+            listeners.add(listener);
+        }
+    }
+    public void removeContainerListener(ContainerListener listener) {
+        synchronized (listeners) {
+            listeners.remove(listener);
+        }
+    }
+    public void fireContainerEvent(String type, Object data) {
+        if (listeners.size() < 1)
+            return;
+        ContainerEvent event = new ContainerEvent(this, type, data);
+        ContainerListener list[] = new ContainerListener[0];
+        synchronized (listeners) {
+            list = (ContainerListener[]) listeners.toArray(list);
+        }
+        for (int i = 0; i < list.length; i++)
+            ((ContainerListener) list[i]).containerEvent(event);
+
+    }
+    public void addListenerDef(ContainerListenerDef listenererDef) {
+        synchronized (listenerDefs) {
+            listenerDefs.add(listenererDef);
+        }
+    }
+
     public String getInfo() {
         return "Minit Servlet Context, vesion 0.1";
     }
@@ -242,5 +276,38 @@ public class StandardContext extends ContainerBase implements Context{
             return (true);
         else
             return (false);
+    }
+
+    public boolean listenerStart() {
+        System.out.println("Listener Start..........");
+        boolean ok = true;
+        synchronized (listeners) {
+            listeners.clear();
+            Iterator<ContainerListenerDef> defs = listenerDefs.iterator();
+            while (defs.hasNext()) {
+                ContainerListenerDef def = defs.next();
+                ContainerListener listener = null;
+                try {
+                    // Identify the class loader we will be using
+                    String listenerClass = def.getListenerClass();
+                    ClassLoader classLoader = null;
+                    classLoader = this.getLoader();
+
+                    ClassLoader oldCtxClassLoader =
+                            Thread.currentThread().getContextClassLoader();
+
+                    // Instantiate a new instance of this filter and return it
+                    Class<?> clazz = classLoader.loadClass(listenerClass);
+                    listener = (ContainerListener) clazz.newInstance();
+
+                    addContainerListener(listener);
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    ok = false;
+                }
+            }
+        }
+
+        return (ok);
     }
 }

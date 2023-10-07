@@ -2,6 +2,7 @@ package com.minit.startup;
 
 import com.minit.Logger;
 import com.minit.connector.http.HttpConnector;
+import com.minit.core.ContainerListenerDef;
 import com.minit.core.FilterDef;
 import com.minit.core.FilterMap;
 import com.minit.core.StandardContext;
@@ -36,6 +37,14 @@ public class BootStrap {
         container.addFilterMap(filterMap);
 
         container.filterStart();
+
+        ContainerListenerDef listenerDef = new ContainerListenerDef();
+        listenerDef.setListenerName("TestListener");
+        listenerDef.setListenerClass("test.TestListener");
+        container.addListenerDef(listenerDef);
+        container.listenerStart();
+
+        container.start();
 
         connector.start();
     }
