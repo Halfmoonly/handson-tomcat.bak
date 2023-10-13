@@ -32,18 +32,6 @@ public class StandardContext extends ContainerBase implements Context{
     public StandardContext() {
         super();
         pipeline.setBasic(new StandardContextValve());
-
-        try {
-            // create a URLClassLoader
-            URL[] urls = new URL[1];
-            URLStreamHandler streamHandler = null;
-            File classPath = new File(BootStrap.WEB_ROOT);
-            String repository = (new URL("file", null, classPath.getCanonicalPath() + File.separator)).toString() ;
-            urls[0] = new URL(null, repository, streamHandler);
-            loader = new URLClassLoader(urls);
-        } catch (IOException e) {
-            System.out.println(e.toString() );
-        }
         log("Container created.");
     }
 
