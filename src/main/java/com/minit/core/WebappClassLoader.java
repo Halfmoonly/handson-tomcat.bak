@@ -59,8 +59,11 @@ public class WebappClassLoader {
             URLStreamHandler streamHandler = null;
             File classPath = new File(System.getProperty("minit.base"));
             String repository = (new URL("file", null, classPath.getCanonicalPath() + File.separator)).toString() ;
-            repository = repository + docbase + File.separator;
+            if (docbase!=null && !docbase.equals("")) {
+                repository = repository + docbase + File.separator;
+            }
             urls[0] = new URL(null, repository, streamHandler);
+            System.out.println("Webapp classloader Repository : "+repository);
             classLoader = new URLClassLoader(urls);
         }
         catch (Exception e) {

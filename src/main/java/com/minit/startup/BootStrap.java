@@ -11,11 +11,7 @@ import java.net.URLClassLoader;
 
 import com.minit.Logger;
 import com.minit.connector.http.HttpConnector;
-import com.minit.core.ContainerListenerDef;
-import com.minit.core.FilterDef;
-import com.minit.core.FilterMap;
-import com.minit.core.StandardContext;
-import com.minit.core.WebappClassLoader;
+import com.minit.core.*;
 import com.minit.logger.FileLogger;
 
 public class BootStrap {
@@ -30,10 +26,8 @@ public class BootStrap {
         System.setProperty("minit.base", WEB_ROOT);
 
         HttpConnector connector = new HttpConnector();
-        StandardContext container = new StandardContext();
+        StandardHost container = new StandardHost();
 
-        container.setPath("/app1");
-        container.setDocBase("app1");
         WebappClassLoader loader = new WebappClassLoader();
         container.setLoader(loader);
         loader.start();
