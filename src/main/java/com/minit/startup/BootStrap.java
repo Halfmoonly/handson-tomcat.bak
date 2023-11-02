@@ -1,14 +1,22 @@
 package com.minit.startup;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.URLClassLoader;
+
 import com.minit.Logger;
 import com.minit.connector.http.HttpConnector;
 import com.minit.core.ContainerListenerDef;
 import com.minit.core.FilterDef;
 import com.minit.core.FilterMap;
 import com.minit.core.StandardContext;
+import com.minit.core.WebappClassLoader;
 import com.minit.logger.FileLogger;
-
-import java.io.File;
 
 public class BootStrap {
     public static final String WEB_ROOT =
@@ -18,34 +26,22 @@ public class BootStrap {
     public static void main(String[] args) {
         if (debug >= 1)
             log(".... startup ....");
+
+        System.setProperty("minit.base", WEB_ROOT);
+
         HttpConnector connector = new HttpConnector();
         StandardContext container = new StandardContext();
+
+        container.setPath("/app1");
+        container.setDocBase("app1");
+        WebappClassLoader loader = new WebappClassLoader();
+        container.setLoader(loader);
+        loader.start();
+
         connector.setContainer(container);
         container.setConnector(connector);
 
-        Logger logger = new FileLogger();
-        container.setLogger(logger);
-
-        FilterDef filterDef = new FilterDef();
-        filterDef.setFilterName("TestFilter");
-        filterDef.setFilterClass("test.TestFilter");
-        container.addFilterDef(filterDef);
-
-        FilterMap filterMap = new FilterMap();
-        filterMap.setFilterName("TestFilter");
-        filterMap.setURLPattern("/*");
-        container.addFilterMap(filterMap);
-
-        container.filterStart();
-
-        ContainerListenerDef listenerDef = new ContainerListenerDef();
-        listenerDef.setListenerName("TestListener");
-        listenerDef.setListenerClass("test.TestListener");
-        container.addListenerDef(listenerDef);
-        container.listenerStart();
-
         container.start();
-
         connector.start();
     }
     private static void log(String message) {
@@ -58,4 +54,5 @@ public class BootStrap {
         exception.printStackTrace(System.out);
 
     }
+
 }
