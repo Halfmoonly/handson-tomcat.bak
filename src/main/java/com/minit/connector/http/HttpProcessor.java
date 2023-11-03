@@ -49,7 +49,7 @@ public class HttpProcessor implements Runnable{
             while (keepAlive) {
                 // create Request object and parse
                 HttpRequestImpl request = new HttpRequestImpl(input);
-//                request.parse(socket);
+                request.parse(socket);
 
                 // handle session
                 if (request.getSessionId() == null || request.getSessionId().equals("")) {
