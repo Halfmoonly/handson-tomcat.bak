@@ -17,3 +17,4 @@ Learning the code of [minit](https://github.com/YaleGuo/minit)
 | geek_chapter11 | Day17、Day18 |
 | geek_chapter12 | Day19、Day20 |
 | geek_chapter13 | Day21、Day22 |
+| geek_chapter14 | Day23、Day24 |
