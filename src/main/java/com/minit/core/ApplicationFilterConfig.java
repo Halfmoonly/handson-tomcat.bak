@@ -11,6 +11,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 import com.minit.Context;
+import com.minit.Loader;
 
 final class ApplicationFilterConfig implements FilterConfig {
 
@@ -72,7 +73,7 @@ final class ApplicationFilterConfig implements FilterConfig {
 
         // Identify the class loader we will be using
         String filterClass = filterDef.getFilterClass();
-        WebappClassLoader classLoader = null;
+        Loader classLoader = null;
         classLoader = context.getLoader();
 
         ClassLoader oldCtxClassLoader =
