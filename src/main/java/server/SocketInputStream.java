@@ -54,7 +54,7 @@ public class SocketInputStream extends InputStream {
             readCount++;
             pos++;
         }
-        requestLine.uriEnd = readCount - 1;
+        requestLine.methodEnd = readCount - 1;
         maxRead = requestLine.uri.length;
         readStart = pos;
         readCount = 0;
